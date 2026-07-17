@@ -417,6 +417,24 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [editingNote, setEditingNote] = useState(null);
 
+  // Kokesto dark mode feature:
+  // Persists light/dark theme selection and defaults to the user's system preference.
+  const [theme, setTheme] = useState(() => {
+    if (typeof window === "undefined") return "dark";
+    return (
+      localStorage.getItem("keep-clone-theme") ||
+      (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+    );
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("keep-clone-theme", theme);
+    } catch {
+      // ignore if storage isn't available
+    }
+  }, [theme]);
+
   function addNote({ title, text }) {
     setNotes((prev) => [...prev, { id: Date.now(), title, text, isArchived: false, isPinned: false }]);
   }
@@ -466,17 +484,30 @@ export default function App() {
       return b.id - a.id;
     });
 
+  const themeVars = theme === "dark" ? {
+    "--bg-main": "#0f111a",
+    "--bg-card": "#171a26",
+    "--bg-hover": "#202436",
+    "--text-primary": "#f8f9fa",
+    "--text-secondary": "#9aa0a6",
+    "--accent": "#ffd700",
+    "--border-color": "#2d3142",
+    background: "linear-gradient(135deg, #0f111a, #131723)",
+  } : {
+    "--bg-main": "#f8f8f2",
+    "--bg-card": "#ffffff",
+    "--bg-hover": "#f1f3f4",
+    "--text-primary": "#202124",
+    "--text-secondary": "#5f6368",
+    "--accent": "#f6c244",
+    "--border-color": "#dadce0",
+    background: "#f8f8f2",
+  };
+
   return (
     <div
       style={{
-        "--bg-main": "#0f111a",
-        "--bg-card": "#171a26",
-        "--bg-hover": "#202436",
-        "--text-primary": "#f8f9fa",
-        "--text-secondary": "#9aa0a6",
-        "--accent": "#ffd700",
-        "--border-color": "#2d3142",
-        background: "linear-gradient(135deg, #0f111a, #131723)",
+        ...themeVars,
         color: "var(--text-primary)",
         minHeight: "100vh",
         display: "flex",
@@ -512,53 +543,73 @@ export default function App() {
             Google Keep <span style={{ color: "var(--accent)", fontWeight: 400 }}>Clone</span>
           </h1>
         </div>
-        <div style={{ position: "relative", width: "min(350px, 60vw)" }}>
-          <Search
-            size={16}
-            style={{
-              position: "absolute",
-              left: 14,
-              top: "50%",
-              transform: "translateY(-50%)",
-              color: "var(--text-secondary)",
-            }}
-          />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search notes..."
-            aria-label="Search notes"
-            style={{
-              width: "100%",
-              background: "var(--bg-main)",
-              border: "1px solid var(--border-color)",
-              color: "var(--text-primary)",
-              padding: "10px 16px 10px 38px",
-              borderRadius: 999,
-              outline: "none",
-              fontFamily: "inherit",
-            }}
-          />
-          {search && (
-            <button
-              onClick={() => setSearch("")}
-              aria-label="Clear search"
+        <div style={{ display: "flex", alignItems: "center", gap: 12, width: "min(450px, 70vw)" }}>
+          <div style={{ position: "relative", flex: 1 }}>
+            <Search
+              size={16}
               style={{
                 position: "absolute",
-                right: 10,
+                left: 14,
                 top: "50%",
                 transform: "translateY(-50%)",
-                background: "none",
-                border: "none",
                 color: "var(--text-secondary)",
-                cursor: "pointer",
-                display: "flex",
               }}
-            >
-              <X size={16} />
-            </button>
-          )}
+            />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search notes..."
+              aria-label="Search notes"
+              style={{
+                width: "100%",
+                background: "var(--bg-main)",
+                border: "1px solid var(--border-color)",
+                color: "var(--text-primary)",
+                padding: "10px 16px 10px 38px",
+                borderRadius: 999,
+                outline: "none",
+                fontFamily: "inherit",
+              }}
+            />
+            {search && (
+              <button
+                onClick={() => setSearch("")}
+                aria-label="Clear search"
+                style={{
+                  position: "absolute",
+                  right: 10,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "none",
+                  border: "none",
+                  color: "var(--text-secondary)",
+                  cursor: "pointer",
+                  display: "flex",
+                }}
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => setTheme((current) => (current === "dark" ? "light" : "dark"))}
+            style={{
+              border: "1px solid var(--border-color)",
+              borderRadius: 999,
+              padding: "10px 16px",
+              cursor: "pointer",
+              background: "var(--bg-main)",
+              color: "var(--text-primary)",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              fontFamily: "inherit",
+            }}
+          >
+            {theme === "dark" ? "Light mode" : "Dark mode"}
+          </button>
         </div>
       </header>
 
