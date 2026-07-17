@@ -57,7 +57,6 @@ function Trash2({ size = 16 }) {
   );
 }
 
-// --- Cursor added: Pin note feature ---
 function Pin({ size = 16 }) {
   return (
     <svg {...iconProps(size)}>
@@ -68,7 +67,6 @@ function Pin({ size = 16 }) {
   );
 }
 
-// --- Cursor added: Copy to clipboard feature ---
 function Copy({ size = 16 }) {
   return (
     <svg {...iconProps(size)}>
@@ -248,7 +246,6 @@ function NoteCard({ note, onOpen, onToggleArchive, onTogglePin, onCopy, onDelete
         {note.text}
       </p>
       <div style={{ marginTop: 14, display: "flex", justifyContent: "flex-end", gap: 12, flexWrap: "wrap" }}>
-        {/* Cursor added: Pin / Unpin button */}
         <button
           type="button"
           title={note.isPinned ? "Unpin note" : "Pin note"}
@@ -261,7 +258,6 @@ function NoteCard({ note, onOpen, onToggleArchive, onTogglePin, onCopy, onDelete
           <Pin size={16} />
           {note.isPinned ? "Unpin" : "Pin"}
         </button>
-        {/* Cursor added: Copy note to clipboard button */}
         <button
           type="button"
           title="Copy note to clipboard"
@@ -422,18 +418,15 @@ export default function App() {
   const [editingNote, setEditingNote] = useState(null);
 
   function addNote({ title, text }) {
-    // Cursor added: isPinned field for pin feature
     setNotes((prev) => [...prev, { id: Date.now(), title, text, isArchived: false, isPinned: false }]);
   }
 
-  // Cursor added: toggle pin state on a note
   function togglePin(id) {
     setNotes((prev) =>
       prev.map((n) => (n.id === id ? { ...n, isPinned: !n.isPinned } : n))
     );
   }
 
-  // Cursor added: copy note text using the Clipboard API
   async function copyNote(note) {
     const content = note.title ? `${note.title}\n\n${note.text}` : note.text;
     try {
@@ -467,7 +460,6 @@ export default function App() {
       const matchesSearch = !query || `${n.title} ${n.text}`.toLowerCase().includes(query);
       return matchesView && matchesSearch;
     })
-    // Cursor added: sort pinned notes to the top
     .sort((a, b) => {
       if (a.isPinned && !b.isPinned) return -1;
       if (!a.isPinned && b.isPinned) return 1;
