@@ -488,8 +488,10 @@ export default function App() {
     "--bg-main": "#0f111a",
     "--bg-card": "#171a26",
     "--bg-hover": "#202436",
+    "--sidebar-bg": "#161b26",
     "--text-primary": "#f8f9fa",
     "--text-secondary": "#9aa0a6",
+    "--empty-heading": "#ffd700",
     "--accent": "#ffd700",
     "--border-color": "#2d3142",
     background: "linear-gradient(135deg, #0f111a, #131723)",
@@ -497,8 +499,10 @@ export default function App() {
     "--bg-main": "#f8f8f2",
     "--bg-card": "#ffffff",
     "--bg-hover": "#f1f3f4",
+    "--sidebar-bg": "#ffffff",
     "--text-primary": "#202124",
     "--text-secondary": "#5f6368",
+    "--empty-heading": "#202124",
     "--accent": "#f6c244",
     "--border-color": "#dadce0",
     background: "#f8f8f2",
@@ -618,7 +622,7 @@ export default function App() {
           aria-label="Note sections"
           style={{
             width: 220,
-            background: "rgba(23,26,38,0.95)",
+            background: "var(--sidebar-bg)",
             padding: "20px 10px",
             borderRight: "1px solid var(--border-color)",
           }}
@@ -677,12 +681,12 @@ export default function App() {
                   padding: 28,
                   textAlign: "center",
                   color: "var(--text-secondary)",
-                  background: "rgba(23,26,38,0.6)",
+                  background: "#ffffff",
                   border: "1px dashed var(--border-color)",
                   borderRadius: 10,
                 }}
               >
-                <h3 style={{ marginBottom: 6, color: "var(--text-primary)", fontWeight: 400 }}>
+                <h3 style={{ marginBottom: 6, color: "var(--empty-heading)", fontWeight: 400 }}>
                   {view === "archive" ? "No archived notes yet" : "No notes found"}
                 </h3>
                 <p>{search ? "Try a different search term." : "Create your first note to get started."}</p>
