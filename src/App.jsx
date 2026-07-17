@@ -433,22 +433,17 @@ export default function App() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/2965/2965358.png"
+            alt="Google Keep Clone logo"
             style={{
               width: 34,
               height: 34,
               borderRadius: 10,
-              background:
-                "radial-gradient(circle at 35% 35%, #ffe35b, #ffb700 50%, #f0b000 70%)",
-              boxShadow: "0 0 0 4px rgba(255,215,0,0.08)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#1a1a1a",
+              objectFit: "cover",
+              background: "#fff",
             }}
-          >
-            <NotebookPen size={18} />
-          </div>
+          />
           <h1 style={{ fontSize: "1.3rem", fontWeight: 400 }}>
             Google Keep <span style={{ color: "var(--accent)", fontWeight: 400 }}>Clone</span>
           </h1>
