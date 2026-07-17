@@ -1,7 +1,79 @@
 import React, { useState, useEffect, useRef } from "react";
-import { NotebookPen, Archive, ArchiveRestore, Trash2, Search, X } from "lucide-react";
 
 const STORAGE_KEY = "keep-clone-notes";
+
+// --- Inline icons (no external icon library needed) ---
+const iconProps = (size) => ({
+  width: size,
+  height: size,
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 2,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+});
+
+function NotebookPen({ size = 18 }) {
+  return (
+    <svg {...iconProps(size)}>
+      <path d="M2 6a2 2 0 0 1 2-2h11v20H4a2 2 0 0 1-2-2Z" />
+      <path d="M15 4h4a2 2 0 0 1 2 2v13.5" />
+      <path d="M9.5 14.5 8 19l4.5-1.5L21 9l-3.5-3.5Z" />
+    </svg>
+  );
+}
+
+function Archive({ size = 16 }) {
+  return (
+    <svg {...iconProps(size)}>
+      <rect x="3" y="4" width="18" height="4" rx="1" />
+      <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8" />
+      <path d="M10 13h4" />
+    </svg>
+  );
+}
+
+function ArchiveRestore({ size = 16 }) {
+  return (
+    <svg {...iconProps(size)}>
+      <rect x="3" y="4" width="18" height="4" rx="1" />
+      <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8" />
+      <path d="M12 16v-4" />
+      <path d="M9.5 14.5 12 12l2.5 2.5" />
+    </svg>
+  );
+}
+
+function Trash2({ size = 16 }) {
+  return (
+    <svg {...iconProps(size)}>
+      <path d="M3 6h18" />
+      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+      <path d="M10 11v6" />
+      <path d="M14 11v6" />
+    </svg>
+  );
+}
+
+function Search({ size = 16, style }) {
+  return (
+    <svg {...iconProps(size)} style={style}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="m21 21-4.35-4.35" />
+    </svg>
+  );
+}
+
+function X({ size = 16 }) {
+  return (
+    <svg {...iconProps(size)}>
+      <path d="M18 6 6 18" />
+      <path d="M6 6l12 12" />
+    </svg>
+  );
+}
 
 function useLocalNotes() {
   const [notes, setNotes] = useState(() => {
