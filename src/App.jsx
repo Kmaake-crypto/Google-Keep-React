@@ -76,6 +76,24 @@ function Copy({ size = 16 }) {
   );
 }
 
+function Bell({ size = 16 }) {
+  return (
+    <svg {...iconProps(size)}>
+      <path d="M18 8a6 6 0 0 0-12 0c0 3-1 4-1 4h14s-1-1-1-4" />
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+    </svg>
+  );
+}
+
+function LabelTag({ size = 16 }) {
+  return (
+    <svg {...iconProps(size)}>
+      <path d="M3 7.5 12 2l9 5.5-9 8.5L3 7.5Z" />
+      <path d="M12 2v8" />
+    </svg>
+  );
+}
+
 function Search({ size = 16, style }) {
   return (
     <svg {...iconProps(size)} style={style}>
@@ -209,25 +227,29 @@ const formBtn = {
   fontSize: "0.95rem",
 };
 
-function NoteCard({ note, onOpen, onToggleArchive, onTogglePin, onCopy, onDelete }) {
+function NoteCard({ note, onOpen, onToggleArchive, onTogglePin, onCopy, onDelete, onRestore }) {
+  const isDeleted = note.isDeleted;
+
   return (
     <div
       role="button"
       tabIndex={0}
-      aria-label={`Open note titled ${note.title || "Untitled"}`}
-      onClick={() => onOpen(note)}
-      onKeyDown={(e) => e.key === "Enter" && onOpen(note)}
+      aria-label={`${isDeleted ? "View deleted note" : `Open note titled ${note.title || "Untitled"}`}`}
+      onClick={() => !isDeleted && onOpen(note)}
+      onKeyDown={(e) => !isDeleted && e.key === "Enter" && onOpen(note)}
       style={{
         background: "var(--bg-card)",
         border: `1px solid ${note.isPinned ? "var(--accent)" : note.isArchived ? "var(--accent)" : "var(--border-color)"}`,
         borderRadius: 10,
         padding: 18,
-        cursor: "pointer",
+        cursor: isDeleted ? "default" : "pointer",
         transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-2px)";
-        e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.3)";
+        if (!isDeleted) {
+          e.currentTarget.style.transform = "translateY(-2px)";
+          e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.3)";
+        }
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = "none";
@@ -246,56 +268,89 @@ function NoteCard({ note, onOpen, onToggleArchive, onTogglePin, onCopy, onDelete
         {note.text}
       </p>
       <div style={{ marginTop: 14, display: "flex", justifyContent: "flex-end", gap: 12, flexWrap: "wrap" }}>
-        <button
-          type="button"
-          title={note.isPinned ? "Unpin note" : "Pin note"}
-          onClick={(e) => {
-            e.stopPropagation();
-            onTogglePin(note.id);
-          }}
-          style={{ ...iconBtn, color: note.isPinned ? "var(--accent)" : "var(--text-secondary)" }}
-        >
-          <Pin size={16} />
-          {note.isPinned ? "Unpin" : "Pin"}
-        </button>
-        <button
-          type="button"
-          title="Copy note to clipboard"
-          onClick={(e) => {
-            e.stopPropagation();
-            onCopy(note);
-          }}
-          style={iconBtn}
-        >
-          <Copy size={16} />
-          Copy
-        </button>
-        <button
-          type="button"
-          title={note.isArchived ? "Move back to notes" : "Archive note"}
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleArchive(note.id);
-          }}
-          style={iconBtn}
-        >
-          {note.isArchived ? <ArchiveRestore size={16} /> : <Archive size={16} />}
-          {note.isArchived ? "Unarchive" : "Archive"}
-        </button>
-        <button
-          type="button"
-          title="Delete note"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete(note.id);
-          }}
-          style={{ ...iconBtn, color: "var(--text-secondary)" }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "#ff6b6b")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
-        >
-          <Trash2 size={16} />
-          Delete
-        </button>
+        {isDeleted ? (
+          <>
+            <button
+              type="button"
+              title="Restore note"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRestore(note.id);
+              }}
+              style={iconBtn}
+            >
+              <ArchiveRestore size={16} />
+              Restore
+            </button>
+            <button
+              type="button"
+              title="Delete note permanently"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(note.id, true);
+              }}
+              style={{ ...iconBtn, color: "var(--text-secondary)" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#ff6b6b")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
+            >
+              <Trash2 size={16} />
+              Delete forever
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              title={note.isPinned ? "Unpin note" : "Pin note"}
+              onClick={(e) => {
+                e.stopPropagation();
+                onTogglePin(note.id);
+              }}
+              style={{ ...iconBtn, color: note.isPinned ? "var(--accent)" : "var(--text-secondary)" }}
+            >
+              <Pin size={16} />
+              {note.isPinned ? "Unpin" : "Pin"}
+            </button>
+            <button
+              type="button"
+              title="Copy note to clipboard"
+              onClick={(e) => {
+                e.stopPropagation();
+                onCopy(note);
+              }}
+              style={iconBtn}
+            >
+              <Copy size={16} />
+              Copy
+            </button>
+            <button
+              type="button"
+              title={note.isArchived ? "Move back to notes" : "Archive note"}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleArchive(note.id);
+              }}
+              style={iconBtn}
+            >
+              {note.isArchived ? <ArchiveRestore size={16} /> : <Archive size={16} />}
+              {note.isArchived ? "Unarchive" : "Archive"}
+            </button>
+            <button
+              type="button"
+              title="Send note to trash"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(note.id);
+              }}
+              style={{ ...iconBtn, color: "var(--text-secondary)" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#ff6b6b")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
+            >
+              <Trash2 size={16} />
+              Trash
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
@@ -413,7 +468,7 @@ const modalField = {
 
 export default function App() {
   const [notes, setNotes] = useLocalNotes();
-  const [view, setView] = useState("notes"); // 'notes' | 'archive'
+  const [view, setView] = useState("notes"); // 'notes' | 'archive' | 'trash' | 'labels' | 'reminders'
   const [search, setSearch] = useState("");
   const [editingNote, setEditingNote] = useState(null);
 
@@ -436,7 +491,10 @@ export default function App() {
   }, [theme]);
 
   function addNote({ title, text }) {
-    setNotes((prev) => [...prev, { id: Date.now(), title, text, isArchived: false, isPinned: false }]);
+    setNotes((prev) => [
+      ...prev,
+      { id: Date.now(), title, text, isArchived: false, isPinned: false, isDeleted: false },
+    ]);
   }
 
   function togglePin(id) {
@@ -460,10 +518,24 @@ export default function App() {
     );
   }
 
-  function deleteNote(id) {
-    if (window.confirm("Delete this note?")) {
-      setNotes((prev) => prev.filter((n) => n.id !== id));
+  function deleteNote(id, permanent = false) {
+    if (!window.confirm(permanent ? "Delete this note permanently?" : "Move this note to Trash?")) {
+      return;
     }
+
+    setNotes((prev) =>
+      prev.flatMap((n) => {
+        if (n.id !== id) return n;
+        if (permanent || n.isDeleted) return [];
+        return { ...n, isDeleted: true, isArchived: false, isPinned: false };
+      })
+    );
+  }
+
+  function restoreNote(id) {
+    setNotes((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, isDeleted: false } : n))
+    );
   }
 
   function saveEdit(id, updates) {
@@ -472,11 +544,27 @@ export default function App() {
   }
 
   const query = search.trim().toLowerCase();
+
+  const sidebarLinks = [
+    { key: "notes", label: "Notes", icon: NotebookPen },
+    { key: "reminders", label: "Reminders", icon: Bell },
+    { key: "labels", label: "Edit labels", icon: LabelTag },
+    { key: "archive", label: "Archive", icon: Archive },
+    { key: "trash", label: "Trash", icon: Trash2 },
+  ];
+
+  const staticLabels = ["Shopping", "Work", "Personal", "Recipes"];
+
   const filtered = notes
     .filter((n) => {
-      const matchesView = view === "archive" ? n.isArchived : !n.isArchived;
+      if (view === "trash") return n.isDeleted;
+      if (view === "archive") return n.isArchived && !n.isDeleted;
+      if (view === "notes") return !n.isArchived && !n.isDeleted;
+      return false;
+    })
+    .filter((n) => {
       const matchesSearch = !query || `${n.title} ${n.text}`.toLowerCase().includes(query);
-      return matchesView && matchesSearch;
+      return matchesSearch;
     })
     .sort((a, b) => {
       if (a.isPinned && !b.isPinned) return -1;
@@ -627,31 +715,125 @@ export default function App() {
             borderRight: "1px solid var(--border-color)",
           }}
         >
-          {[
-            { key: "notes", label: "Notes" },
-            { key: "archive", label: "Archive" },
-          ].map((tab) => (
+          <div style={{ padding: "0 16px", marginBottom: 18 }}>
+            <h2 style={{
+              fontSize: "0.85rem",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "var(--text-secondary)",
+              margin: 0,
+            }}>
+              Keep sections
+            </h2>
+          </div>
+
+          <div style={{ display: "grid", gap: 6, padding: "0 16px" }}>
+            {sidebarLinks.slice(0, 3).map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setView(tab.key)}
+                  aria-pressed={view === tab.key}
+                  style={{
+                    width: "100%",
+                    background: view === tab.key ? "var(--bg-hover)" : "none",
+                    border: "none",
+                    color: view === tab.key ? "var(--accent)" : "var(--text-secondary)",
+                    padding: "12px 14px",
+                    textAlign: "left",
+                    fontSize: "0.95rem",
+                    borderRadius: "0 25px 25px 0",
+                    cursor: "pointer",
+                    display: "flex",
+                    gap: 12,
+                    alignItems: "center",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  <Icon size={18} />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div style={{ marginTop: 18, display: "grid", gap: 6, padding: "0 16px" }}>
+            {sidebarLinks.slice(3).map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setView(tab.key)}
+                  aria-pressed={view === tab.key}
+                  style={{
+                    width: "100%",
+                    background: view === tab.key ? "var(--bg-hover)" : "none",
+                    border: "none",
+                    color: view === tab.key ? "var(--accent)" : "var(--text-secondary)",
+                    padding: "12px 14px",
+                    textAlign: "left",
+                    fontSize: "0.95rem",
+                    borderRadius: "0 25px 25px 0",
+                    cursor: "pointer",
+                    display: "flex",
+                    gap: 12,
+                    alignItems: "center",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  <Icon size={18} />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div style={{ marginTop: 26, padding: "0 16px" }}>
+            <p style={{ color: "var(--text-secondary)", fontSize: "0.8rem", margin: "0 0 10px" }}>Labels</p>
+            {staticLabels.map((label) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => setView("labels")}
+                style={{
+                  width: "100%",
+                  background: view === "labels" ? "var(--bg-hover)" : "none",
+                  border: "none",
+                  color: view === "labels" ? "var(--accent)" : "var(--text-secondary)",
+                  padding: "10px 14px",
+                  textAlign: "left",
+                  fontSize: "0.95rem",
+                  borderRadius: "0 20px 20px 0",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  fontFamily: "inherit",
+                }}
+              >
+                <span style={{ width: 8, height: 8, borderRadius: 999, background: "var(--text-secondary)" }} />
+                {label}
+              </button>
+            ))}
             <button
-              key={tab.key}
-              onClick={() => setView(tab.key)}
-              aria-pressed={view === tab.key}
+              type="button"
+              onClick={() => setView("labels")}
               style={{
                 width: "100%",
-                background: view === tab.key ? "var(--bg-hover)" : "none",
+                background: "none",
                 border: "none",
-                color: view === tab.key ? "var(--accent)" : "var(--text-secondary)",
-                padding: "12px 16px",
+                color: "var(--accent)",
+                padding: "10px 14px",
                 textAlign: "left",
-                fontSize: "1rem",
-                borderRadius: "0 25px 25px 0",
+                fontSize: "0.95rem",
                 cursor: "pointer",
-                marginBottom: 6,
                 fontFamily: "inherit",
               }}
             >
-              {tab.label}
+              + Create label
             </button>
-          ))}
+          </div>
         </aside>
 
         <main
@@ -674,7 +856,41 @@ export default function App() {
               gap: 20,
             }}
           >
-            {filtered.length === 0 ? (
+            {view === "labels" ? (
+              <div
+                style={{
+                  gridColumn: "1 / -1",
+                  padding: 28,
+                  textAlign: "center",
+                  color: "var(--text-secondary)",
+                  background: "#ffffff",
+                  border: "1px dashed var(--border-color)",
+                  borderRadius: 10,
+                }}
+              >
+                <h3 style={{ marginBottom: 10, color: "var(--empty-heading)", fontWeight: 400 }}>
+                  Edit labels
+                </h3>
+                <p>Use labels to keep related notes together. This clone includes a sidebar preview for labels.</p>
+              </div>
+            ) : view === "reminders" ? (
+              <div
+                style={{
+                  gridColumn: "1 / -1",
+                  padding: 28,
+                  textAlign: "center",
+                  color: "var(--text-secondary)",
+                  background: "#ffffff",
+                  border: "1px dashed var(--border-color)",
+                  borderRadius: 10,
+                }}
+              >
+                <h3 style={{ marginBottom: 10, color: "var(--empty-heading)", fontWeight: 400 }}>
+                  Reminders
+                </h3>
+                <p>Reminders are not implemented yet, but this section matches the Keep experience.</p>
+              </div>
+            ) : filtered.length === 0 ? (
               <div
                 style={{
                   gridColumn: "1 / -1",
@@ -687,9 +903,13 @@ export default function App() {
                 }}
               >
                 <h3 style={{ marginBottom: 6, color: "var(--empty-heading)", fontWeight: 400 }}>
-                  {view === "archive" ? "No archived notes yet" : "No notes found"}
+                  {view === "archive"
+                    ? "No archived notes yet"
+                    : view === "trash"
+                    ? "No notes in Trash"
+                    : "No notes found"}
                 </h3>
-                <p>{search ? "Try a different search term." : "Create your first note to get started."}</p>
+                <p>{search ? "Try a different search term." : view === "notes" ? "Create your first note to get started." : "Switch to Notes to create or view your notes."}</p>
               </div>
             ) : (
               filtered.map((note) => (
@@ -701,6 +921,7 @@ export default function App() {
                   onTogglePin={togglePin}
                   onCopy={copyNote}
                   onDelete={deleteNote}
+                  onRestore={restoreNote}
                 />
               ))
             )}
