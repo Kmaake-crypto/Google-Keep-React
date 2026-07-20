@@ -94,6 +94,44 @@ function LabelTag({ size = 16 }) {
   );
 }
 
+function ShoppingCart({ size = 16 }) {
+  return (
+    <svg {...iconProps(size)}>
+      <circle cx="9" cy="21" r="1" />
+      <circle cx="20" cy="21" r="1" />
+      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+    </svg>
+  );
+}
+
+function Briefcase({ size = 16 }) {
+  return (
+    <svg {...iconProps(size)}>
+      <rect x="2" y="7" width="20" height="14" rx="2" />
+      <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+      <path d="M9 12h6" />
+    </svg>
+  );
+}
+
+function Heart({ size = 16 }) {
+  return (
+    <svg {...iconProps(size)}>
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+    </svg>
+  );
+}
+
+function UtensilsCrossed({ size = 16 }) {
+  return (
+    <svg {...iconProps(size)}>
+      <path d="M3 2v7c0 1.1.9 2 2 2h4v4l-1 1h6l-1-1v-4h4c1.1 0 2-.9 2-2V2" />
+      <path d="M7 15v4" />
+      <path d="M17 2v4" />
+    </svg>
+  );
+}
+
 function Search({ size = 16, style }) {
   return (
     <svg {...iconProps(size)} style={style}>
@@ -553,7 +591,12 @@ export default function App() {
     { key: "trash", label: "Trash", icon: Trash2 },
   ];
 
-  const staticLabels = ["Shopping", "Work", "Personal", "Recipes"];
+  const staticLabels = [
+    { name: "Shopping", icon: ShoppingCart },
+    { name: "Work", icon: Briefcase },
+    { name: "Personal", icon: Heart },
+    { name: "Recipes", icon: UtensilsCrossed },
+  ];
 
   const filtered = notes
     .filter((n) => {
@@ -791,31 +834,34 @@ export default function App() {
 
           <div style={{ marginTop: 26, padding: "0 16px" }}>
             <p style={{ color: "var(--text-secondary)", fontSize: "0.8rem", margin: "0 0 10px" }}>Labels</p>
-            {staticLabels.map((label) => (
-              <button
-                key={label}
-                type="button"
-                onClick={() => setView("labels")}
-                style={{
-                  width: "100%",
-                  background: view === "labels" ? "var(--bg-hover)" : "none",
-                  border: "none",
-                  color: view === "labels" ? "var(--accent)" : "var(--text-secondary)",
-                  padding: "10px 14px",
-                  textAlign: "left",
-                  fontSize: "0.95rem",
-                  borderRadius: "0 20px 20px 0",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  fontFamily: "inherit",
-                }}
-              >
-                <span style={{ width: 8, height: 8, borderRadius: 999, background: "var(--text-secondary)" }} />
-                {label}
-              </button>
-            ))}
+            {staticLabels.map((labelObj) => {
+              const LabelIcon = labelObj.icon;
+              return (
+                <button
+                  key={labelObj.name}
+                  type="button"
+                  onClick={() => setView("labels")}
+                  style={{
+                    width: "100%",
+                    background: view === "labels" ? "var(--bg-hover)" : "none",
+                    border: "none",
+                    color: view === "labels" ? "var(--accent)" : "var(--text-secondary)",
+                    padding: "10px 14px",
+                    textAlign: "left",
+                    fontSize: "0.95rem",
+                    borderRadius: "0 20px 20px 0",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    fontFamily: "inherit",
+                  }}
+                >
+                  <LabelIcon size={16} />
+                  {labelObj.name}
+                </button>
+              );
+            })}
             <button
               type="button"
               onClick={() => setView("labels")}
